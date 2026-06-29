@@ -1,0 +1,5 @@
+candidate_id,contact,segment,source,active_agent_workflow,debugging_pain,terminal_comfort,local_first_need,feedback_availability,wedge_fit,privacy_fit,relationship_strength,notes
+cand-001,AGENT_FOUNDER_NAME,agent founder,warm intro,3,3,3,2,3,3,3,2,building an agent product and debugging tool behavior weekly
+cand-002,AGENT_INFRA_NAME,agent infra engineer,existing contact,3,2,3,3,2,3,3,2,owns local agent tooling support or eval workflows
+cand-003,LOCAL_AUTOMATION_NAME,local automation builder,known user,2,2,3,2,2,2,3,3,uses local scripts or notebooks and can give candid first-run feedback
+cand-004,LATER_CANDIDATE_NAME,other,backlog,1,1,2,1,1,1,2,1,keep as later backup unless wedge fit improves

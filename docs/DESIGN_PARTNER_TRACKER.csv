@@ -1,0 +1,4 @@
+partner_id,contact,segment,artifact_sent,artifact_sha256,sent_at,status,current_step,installed_at,workflow_completed_at,feedback_path,support_packet_path,handoff_path,bundle_path,blocker,next_follow_up_at,owner,decision,notes
+dp-001,AGENT_FOUNDER_NAME,agent founder,agent-black-box-0.1.0-design-partner.zip,SHA256_FROM_RELEASE_MANIFEST,,candidate,send founder email,,,,,,,,,YOUR_NAME,,replace contact then send founder draft
+dp-002,AGENT_INFRA_NAME,agent infra engineer,agent-black-box-0.1.0-design-partner.zip,SHA256_FROM_RELEASE_MANIFEST,,candidate,send infra email,,,,,,,,,YOUR_NAME,,replace contact then send infra draft
+dp-003,LOCAL_AUTOMATION_NAME,local automation builder,agent-black-box-0.1.0-design-partner.zip,SHA256_FROM_RELEASE_MANIFEST,,candidate,send automation dm,,,,,,,,,YOUR_NAME,,replace contact then send automation draft

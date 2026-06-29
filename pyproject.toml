@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-black-box"
+description = "Local-first flight recorder and replay debugger for AI agents."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [{ name = "Agent Black Box" }]
+keywords = ["ai", "agents", "debugging", "observability", "local-first", "tracing"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Software Development :: Debuggers",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = []
+dynamic = ["version"]
+
+[project.scripts]
+abb = "agent_black_box.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "agent_black_box.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
