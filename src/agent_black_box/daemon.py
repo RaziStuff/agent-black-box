@@ -716,6 +716,7 @@ abb start</pre>
             <button onclick="exportRun('${run.run_id}', 'handoff')">Export Handoff</button>
             <button onclick="exportRun('${run.run_id}', 'markdown')">Export MD</button>
             <button onclick="exportRun('${run.run_id}', 'jsonl')">Export JSONL</button>
+            <button data-testid="delete-run-button" onclick="deleteRun('${run.run_id}')">Delete Run</button>
           </div>
         </div>
         <div class="metrics">
@@ -1413,6 +1414,40 @@ abb start</pre>
       detail.insertAdjacentHTML("afterbegin", `<div class="item"><strong>Exported</strong><div class="meta">${escapeHtml(result.path)}</div></div>`);
     }
 
+    async function deleteRun(runId) {
+      const run = state.runs.find(candidate => candidate.run_id === runId);
+      const label = run ? `${run.name} (${run.run_id})` : runId;
+      if (!confirm(`Delete ${label}? This removes the local trace, artifacts, fixtures, and default exports for this run.`)) {
+        return;
+      }
+      const response = await fetch(`/v1/runs/${encodeURIComponent(runId)}`, {method: "DELETE"});
+      const result = await response.json();
+      if (!response.ok) {
+        alert(result.message || result.error || "Delete failed");
+        return;
+      }
+      state.selectedRunId = null;
+      state.selectedArtifactId = null;
+      state.selectedSpanId = null;
+      state.artifactIndex = {};
+      state.artifactTextCache = {};
+      state.runs = await fetchJson("/v1/runs?limit=100");
+      state.fixtures = await fetchJson("/v1/fixtures?limit=100");
+      renderSidebar();
+      const detail = document.getElementById("detail");
+      detail.className = "";
+      detail.innerHTML = `
+        <div class="item" data-testid="delete-run-result">
+          <strong>Deleted ${escapeHtml(result.run_id)}</strong>
+          <div class="meta">
+            ${escapeHtml(result.counts.artifacts || 0)} artifacts ·
+            ${escapeHtml(result.counts.artifact_objects || 0)} object files ·
+            ${escapeHtml(result.counts.export_files || 0)} export files
+          </div>
+        </div>
+      `;
+    }
+
     async function importBundle() {
       const pathInput = document.getElementById("importPath");
       const conflictInput = document.getElementById("importConflict");
@@ -1996,6 +2031,30 @@ class ABBRequestHandler(BaseHTTPRequestHandler):
             self._json(400, {"error": "missing_field", "field": str(exc)})
         except ValueError as exc:
             self._json(400, {"error": "bad_request", "message": str(exc)})
+        except Exception as exc:
+            self._json(500, {"error": "internal_error", "message": str(exc)})
+
+    def do_DELETE(self) -> None:
+        if not self._authorized():
+            return
+        parsed = urlparse(self.path)
+        path = parsed.path
+        query = parse_qs(parsed.query)
+        try:
+            parts = path.strip("/").split("/")
+            if len(parts) == 3 and parts[0] == "v1" and parts[1] == "runs":
+                run_id = parts[2]
+                keep_exports = (query.get("keep_exports", ["false"])[0] or "").lower() in {
+                    "1",
+                    "true",
+                    "yes",
+                    "on",
+                }
+                self._json(200, self.store.delete_run(run_id, include_exports=not keep_exports))
+                return
+            self._json(404, {"error": "not_found"})
+        except KeyError:
+            self._json(404, {"error": "run_not_found"})
         except Exception as exc:
             self._json(500, {"error": "internal_error", "message": str(exc)})
 

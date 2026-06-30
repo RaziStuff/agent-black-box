@@ -246,9 +246,9 @@ def collect_static_checks(root: Path) -> List[Dict[str, str]]:
         )
 
     content_checks = {
-        "README.md": ["scripts/release-readiness.py", "scripts/smoke.sh", "scripts/build-release.py", "scripts/rank-design-partners.py", "scripts/prepare-design-partner-send.py", "scripts/feedback-summary.py", "design-partner.zip", "DESIGN_PARTNER_INTAKE.md", "DESIGN_PARTNER_FIRST_SEND_PACKET.md", "DESIGN_PARTNER_OUTREACH.md", "DESIGN_PARTNER_FEEDBACK_FORM.md", "DESIGN_PARTNER_TRACKER.md", "abb doctor", "abb agent-kit", "--zip", "/v1/agent-kit"],
-        "docs/API_REFERENCE.md": ["/v1/agent-kit", "agent-kit.json", "AGENT_BLACK_BOX.md", "zip_path", "sha256"],
-        "docs/RELEASE_CHECKLIST.md": [SHIP, SHIP_WITH_KNOWN_SKIPS, DO_NOT_SHIP, "scripts/build-release.py", "scripts/rank-design-partners.py", "scripts/prepare-design-partner-send.py", "scripts/feedback-summary.py", "DESIGN_PARTNER_INTAKE.md", "DESIGN_PARTNER_FIRST_SEND_PACKET.md", "DESIGN_PARTNER_OUTREACH.md", "DESIGN_PARTNER_FEEDBACK_FORM.md", "DESIGN_PARTNER_TRACKER.md", "design-partner.zip", "release-manifest.json", "abb agent-kit --json", "abb agent-kit --zip", "/v1/agent-kit"],
+        "README.md": ["scripts/release-readiness.py", "scripts/smoke.sh", "scripts/build-release.py", "scripts/rank-design-partners.py", "scripts/prepare-design-partner-send.py", "scripts/feedback-summary.py", "design-partner.zip", "DESIGN_PARTNER_INTAKE.md", "DESIGN_PARTNER_FIRST_SEND_PACKET.md", "DESIGN_PARTNER_OUTREACH.md", "DESIGN_PARTNER_FEEDBACK_FORM.md", "DESIGN_PARTNER_TRACKER.md", "abb doctor", "abb agent-kit", "abb delete RUN_ID --yes", "DELETE /v1/runs/RUN_ID", "--zip", "/v1/agent-kit"],
+        "docs/API_REFERENCE.md": ["/v1/agent-kit", "agent-kit.json", "AGENT_BLACK_BOX.md", "zip_path", "sha256", "DELETE", "/v1/runs/{run_id}", "keep_exports"],
+        "docs/RELEASE_CHECKLIST.md": [SHIP, SHIP_WITH_KNOWN_SKIPS, DO_NOT_SHIP, "scripts/build-release.py", "scripts/rank-design-partners.py", "scripts/prepare-design-partner-send.py", "scripts/feedback-summary.py", "DESIGN_PARTNER_INTAKE.md", "DESIGN_PARTNER_FIRST_SEND_PACKET.md", "DESIGN_PARTNER_OUTREACH.md", "DESIGN_PARTNER_FEEDBACK_FORM.md", "DESIGN_PARTNER_TRACKER.md", "design-partner.zip", "release-manifest.json", "abb delete RUN_ID --yes", "DELETE /v1/runs/RUN_ID", "abb agent-kit --json", "abb agent-kit --zip", "/v1/agent-kit"],
         "docs/LOCAL_ALPHA_CHECKLIST.md": ["scripts/release-readiness.py", "scripts/build-release.py", "scripts/rank-design-partners.py", "scripts/prepare-design-partner-send.py", "scripts/feedback-summary.py", "DESIGN_PARTNER_INTAKE.csv", "DESIGN_PARTNER_FIRST_SEND_PACKET.md", "DESIGN_PARTNER_OUTREACH.md", "DESIGN_PARTNER_FEEDBACK_FORM.md", "DESIGN_PARTNER_TRACKER.csv", "design-partner.zip", "release-manifest.json", "abb support RUN_ID", "abb agent-kit --json", "abb agent-kit --zip", "/v1/agent-kit"],
         "docs/DESIGN_PARTNER_INTAKE.md": ["Score Fields", "Dealbreakers", "Selection Rule", "active_agent_workflow", "scripts/rank-design-partners.py", ".abb-send/design-partner-ranking.md"],
         "docs/DESIGN_PARTNER_INTAKE.csv": ["candidate_id,contact,segment", "active_agent_workflow", "debugging_pain", "privacy_fit", "AGENT_FOUNDER_NAME"],
@@ -259,13 +259,13 @@ def collect_static_checks(root: Path) -> List[Dict[str, str]]:
         "docs/DESIGN_PARTNER_TRACKER.md": ["Status Values", "DESIGN_PARTNER_INTAKE.md", "DESIGN_PARTNER_FIRST_SEND_PACKET.md", "artifact_sha256", "support_packet_path", "next_follow_up_at", "decision"],
         "docs/DESIGN_PARTNER_TRACKER.csv": ["partner_id,contact,segment", "AGENT_FOUNDER_NAME", "AGENT_INFRA_NAME", "LOCAL_AUTOMATION_NAME", "artifact_sha256", "SHA256_FROM_RELEASE_MANIFEST", "next_follow_up_at", "decision"],
         "docs/FIRST_USER_WORKFLOW.md": ["design-partner.zip", "sh install.sh", "abb agent-kit --zip", "release-manifest.json", "DESIGN_PARTNER_FEEDBACK_FORM.md"],
-        "src/agent_black_box/cli.py": ["agent-kit", "TROUBLESHOOTING.txt", "KNOWN_LIMITATIONS.txt"],
-        "src/agent_black_box/daemon.py": ["Agent Kit", "/v1/agent-kit", "agent-kit-button", "agent-kit-zip"],
+        "src/agent_black_box/cli.py": ["agent-kit", "delete", "keep-exports", "TROUBLESHOOTING.txt", "KNOWN_LIMITATIONS.txt"],
+        "src/agent_black_box/daemon.py": ["Agent Kit", "/v1/agent-kit", "agent-kit-button", "agent-kit-zip", "delete-run-button", "DELETE"],
         "scripts/build-release.py": ["py3-none-any.whl", "tar.gz", "design-partner.zip", "QUICKSTART.md", "release-manifest.json", "sha256", "pip install --no-index"],
         "scripts/feedback-summary.py": ["Workflow Completion", "possible_redaction_issue", "Design Partner Feedback Summary", "suggested_actions"],
         "scripts/prepare-design-partner-send.py": ["design_partner_kit", "DESIGN_PARTNER_TRACKER", "AGENT_FOUNDER_NAME", "next_business_day", ".abb-send/design-partner-send-queue.md"],
         "scripts/rank-design-partners.py": ["SCORE_FIELDS", "CORE_SEGMENTS", "disqualified", "low_signal", "Design Partner Candidate Ranking"],
-        "scripts/smoke.sh": ["agent-kit", "--zip", "/v1/agent-kit", "sha256", "TROUBLESHOOTING.txt", "KNOWN_LIMITATIONS.txt", "scripts/http-client-smoke.py"],
+        "scripts/smoke.sh": ["agent-kit", "--zip", "/v1/agent-kit", "DELETE", "abb delete", "sha256", "TROUBLESHOOTING.txt", "KNOWN_LIMITATIONS.txt", "scripts/http-client-smoke.py"],
         "examples/http_agent_client.py": ["/v1/openapi.json", "/v1/runs"],
         "examples/js-agent-client.mjs": ["/v1/openapi.json", "/v1/runs"],
     }

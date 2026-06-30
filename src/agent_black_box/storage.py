@@ -564,6 +564,117 @@ class ABBStore:
             ).fetchall()
         return [self._artifact_row(row) for row in rows]
 
+    def delete_run(self, run_id: str, include_exports: bool = True) -> Dict[str, Any]:
+        run = self.get_run(run_id)
+        if not run:
+            raise KeyError(run_id)
+
+        with self._lock:
+            spans_count = self._count_rows("spans", run_id)
+            events_count = self._count_rows("events", run_id)
+            annotations_count = self._count_rows("annotations", run_id)
+            fixtures_count = self._count_rows("replay_fixtures", run_id)
+            artifact_rows = [
+                self._artifact_row(row)
+                for row in self._conn.execute(
+                    "SELECT * FROM artifacts WHERE run_id = ?",
+                    (run_id,),
+                ).fetchall()
+            ]
+            linked_investigations = [
+                row["run_id"]
+                for row in self._conn.execute(
+                    """
+                    SELECT run_id FROM runs
+                    WHERE metadata_json LIKE ?
+                       OR metadata_json LIKE ?
+                    ORDER BY created_at ASC
+                    """,
+                    (
+                        f'%"source_handoff_run_id": "{run_id}"%',
+                        f'%"source_compare_run_id": "{run_id}"%',
+                    ),
+                ).fetchall()
+            ]
+
+            artifact_hashes = sorted({artifact["hash"] for artifact in artifact_rows})
+            try:
+                self._conn.execute("DELETE FROM artifacts WHERE run_id = ?", (run_id,))
+                self._conn.execute("DELETE FROM runs WHERE run_id = ?", (run_id,))
+                removed_objects = self._remove_unreferenced_objects(artifact_hashes)
+                exported_files = (
+                    self._remove_run_exports(run_id) if include_exports else {"count": 0, "bytes": 0, "paths": []}
+                )
+                self._conn.commit()
+            except Exception:
+                self._conn.rollback()
+                raise
+
+        return {
+            "run_id": run_id,
+            "deleted": True,
+            "counts": {
+                "runs": 1,
+                "spans": spans_count,
+                "events": events_count,
+                "artifacts": len(artifact_rows),
+                "annotations": annotations_count,
+                "fixtures": fixtures_count,
+                "artifact_objects": removed_objects["count"],
+                "artifact_bytes": removed_objects["bytes"],
+                "export_files": exported_files["count"],
+                "export_bytes": exported_files["bytes"],
+                "linked_investigations": len(linked_investigations),
+            },
+            "artifact_hashes": artifact_hashes,
+            "removed_artifact_paths": removed_objects["paths"],
+            "removed_export_paths": exported_files["paths"],
+            "linked_investigations": linked_investigations,
+        }
+
+    def _count_rows(self, table: str, run_id: str) -> int:
+        row = self._conn.execute(f"SELECT COUNT(*) AS count FROM {table} WHERE run_id = ?", (run_id,)).fetchone()
+        return int(row["count"]) if row else 0
+
+    def _remove_unreferenced_objects(self, hashes: List[str]) -> Dict[str, Any]:
+        removed_paths: List[str] = []
+        removed_bytes = 0
+        for digest in hashes:
+            row = self._conn.execute(
+                "SELECT COUNT(*) AS count FROM artifacts WHERE hash = ?",
+                (digest,),
+            ).fetchone()
+            if row and int(row["count"]):
+                continue
+            path = self.objects_dir / "sha256" / digest[:2] / digest[2:4] / digest
+            try:
+                size = path.stat().st_size
+                path.unlink()
+            except FileNotFoundError:
+                continue
+            removed_bytes += size
+            removed_paths.append(str(path.relative_to(self.root)))
+            _remove_empty_parents(path.parent, stop=self.objects_dir)
+        return {"count": len(removed_paths), "bytes": removed_bytes, "paths": removed_paths}
+
+    def _remove_run_exports(self, run_id: str) -> Dict[str, Any]:
+        token = _safe_export_token(run_id)
+        removed_paths: List[str] = []
+        removed_bytes = 0
+        if not self.exports_dir.exists():
+            return {"count": 0, "bytes": 0, "paths": []}
+        for path in sorted(self.exports_dir.glob(f"{token}.*")):
+            if not path.is_file():
+                continue
+            try:
+                size = path.stat().st_size
+                path.unlink()
+            except FileNotFoundError:
+                continue
+            removed_bytes += size
+            removed_paths.append(str(path.relative_to(self.root)))
+        return {"count": len(removed_paths), "bytes": removed_bytes, "paths": removed_paths}
+
     def create_fixture(self, run_id: str, name: Optional[str] = None) -> Dict[str, Any]:
         timeline = self.get_timeline(run_id)
         run = timeline["run"]
@@ -1268,6 +1379,17 @@ def _safe_bundle_id(value: str) -> bool:
     if not value or "/" in value or "\\" in value or ".." in value:
         return False
     return all(character.isalnum() or character in {"_", "-"} for character in value)
+
+
+def _remove_empty_parents(path: Path, stop: Path) -> None:
+    current = path
+    stop = stop.resolve()
+    while current.resolve() != stop and stop in current.resolve().parents:
+        try:
+            current.rmdir()
+        except OSError:
+            return
+        current = current.parent
 
 
 def _safe_export_token(value: str) -> str:

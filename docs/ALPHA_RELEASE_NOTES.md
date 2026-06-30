@@ -34,6 +34,7 @@ release.
 - Track each send in `docs/DESIGN_PARTNER_TRACKER.csv` so install status, blockers, support artifacts, follow-up date, and alpha decision are explicit.
 - Run `abb init` to generate a local setup guide for CLI capture, Python SDK instrumentation, OpenAI import-swap capture, and OpenAI-compatible proxy routing.
 - Export/import portable `.abb` bundles, including duplicate `skip` and `remap` modes.
+- Delete a local run with `abb delete RUN_ID --yes` or the browser delete action; deletion removes trace rows, unreferenced artifact object files, replay fixtures, and default exports while keeping linked investigation runs.
 - Record OpenAI-compatible model calls through `from agent_black_box.openai import OpenAI` without starting the daemon.
 - Record LangChain-style chain/model/tool callbacks through `AgentBlackBoxCallbackHandler` without requiring LangChain at install time.
 - Record LangGraph-style node state transitions through `LangGraphRecorder.wrap_node` without requiring LangGraph at install time.

@@ -16,7 +16,7 @@ For common setup and workflow fixes, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md
 ## Local Store
 
 - Data lives in the configured local store, `.abb/` by default.
-- There is no automatic retention policy or cleanup command yet.
+- Runs can be deleted manually with `abb delete RUN_ID --yes`, but there is no automatic retention policy yet.
 - Large traces do not have pagination yet.
 - `.abb` bundles include artifact payloads and should be handled as full trace archives.
 - `.handoff.json` packets are compact summaries and do not embed full artifact payloads.

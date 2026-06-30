@@ -74,6 +74,7 @@ also includes `zip_path`, `sha256`, and an `archive` block for `agent-kit.zip`.
 | `GET` | `/v1/runs/{run_id}/links` | `abb show RUN_ID` | Read source and investigation links. |
 | `POST` | `/v1/runs/{run_id}/end` | SDK recorder end | Mark a run complete. |
 | `POST` | `/v1/runs/{run_id}/export` | `abb export RUN_ID --format FORMAT` | Export JSONL, Markdown, handoff JSON, or a portable `.abb` bundle. |
+| `DELETE` | `/v1/runs/{run_id}?keep_exports=false` | `abb delete RUN_ID --yes` | Delete a run, local artifacts, fixtures, and default export files. |
 
 Minimal run create body:
 
@@ -85,6 +86,10 @@ Minimal run create body:
   "metadata": {}
 }
 ```
+
+Delete returns a summary of removed trace rows, artifact object files, export
+files, and linked investigation runs that were kept. Set `keep_exports=true` to
+remove only the live trace and object files while preserving default exports.
 
 ## Capture
 

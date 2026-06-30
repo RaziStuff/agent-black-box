@@ -29,8 +29,8 @@ $PYTHON_BIN scripts/http-client-smoke.py
 abb doctor
 abb doctor --json | "$PYTHON_BIN" -c 'import json,sys; report=json.load(sys.stdin); assert report["status"] in ("ok", "warning"), report; assert "checks" in report; assert "api" in report and report["api"]["service"] == "agent-black-box", report; print("Doctor JSON status:", report["status"])'
 abb endpoints
-abb endpoints --json | "$PYTHON_BIN" -c 'import json,sys; manifest=json.load(sys.stdin); paths=[endpoint["path"] for endpoint in manifest["endpoints"]]; assert "/v1/runs/{run_id}/compare-evidence" in paths, manifest; assert "/v1/endpoints" in paths, manifest; assert "/v1/agent-kit" in paths, manifest; print("Endpoint manifest visible")'
-abb endpoints --openapi | "$PYTHON_BIN" -c 'import json,sys; spec=json.load(sys.stdin); paths=spec["paths"]; assert spec["openapi"] == "3.1.0", spec; assert "/v1/openapi.json" in paths, paths; assert "/v1/runs/{run_id}/compare-evidence" in paths, paths; assert "/v1/agent-kit" in paths, paths; print("OpenAPI manifest visible")'
+abb endpoints --json | "$PYTHON_BIN" -c 'import json,sys; manifest=json.load(sys.stdin); endpoints={(endpoint["method"], endpoint["path"]) for endpoint in manifest["endpoints"]}; assert ("GET", "/v1/runs/{run_id}/compare-evidence") in endpoints, manifest; assert ("DELETE", "/v1/runs/{run_id}") in endpoints, manifest; assert ("GET", "/v1/endpoints") in endpoints, manifest; assert ("POST", "/v1/agent-kit") in endpoints, manifest; print("Endpoint manifest visible")'
+abb endpoints --openapi | "$PYTHON_BIN" -c 'import json,sys; spec=json.load(sys.stdin); paths=spec["paths"]; assert spec["openapi"] == "3.1.0", spec; assert "/v1/openapi.json" in paths, paths; assert "/v1/runs/{run_id}/compare-evidence" in paths, paths; assert "delete" in paths["/v1/runs/{run_id}"], paths["/v1/runs/{run_id}"]; assert "/v1/agent-kit" in paths, paths; print("OpenAPI manifest visible")'
 "$PYTHON_BIN" examples/http_agent_client.py --help >/dev/null
 [ -f examples/js-agent-client.mjs ]
 [ -f docs/AGENT_INTEGRATION_PROMPT.md ]
@@ -118,5 +118,15 @@ abb show "$RUN_ID"
 ABB_HOME="$SMOKE_HOME"
 export ABB_HOME
 abb artifacts "$RUN_ID"
+abb record --name smoke-delete -- "$PYTHON_BIN" examples/basic_agent.py
+DELETE_RUN_ID="$(abb runs --json | "$PYTHON_BIN" -c 'import json,sys; runs=json.load(sys.stdin); print(next(run["run_id"] for run in runs if run["name"] == "smoke-delete"))')"
+DELETE_EXPORT="$(abb export "$DELETE_RUN_ID" --format markdown)"
+abb fixture create "$DELETE_RUN_ID" --name delete-fixture >/dev/null
+abb delete "$DELETE_RUN_ID" --yes --json | "$PYTHON_BIN" -c 'import json,sys; result=json.load(sys.stdin); assert result["deleted"], result; assert result["counts"]["fixtures"] == 1, result; assert result["counts"]["export_files"] >= 1, result; print("Delete summary visible")'
+if [ -e "$DELETE_EXPORT" ]; then
+  printf 'Delete export still exists: %s\n' "$DELETE_EXPORT" >&2
+  exit 1
+fi
+abb runs --json | "$PYTHON_BIN" -c 'import json,sys; runs=json.load(sys.stdin); deleted=sys.argv[1]; assert all(run["run_id"] != deleted for run in runs), runs; print("Deleted run removed from list")' "$DELETE_RUN_ID"
 
 printf '\nSmoke test complete.\n'

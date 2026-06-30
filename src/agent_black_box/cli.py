@@ -109,6 +109,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_show.add_argument("--json", action="store_true")
     p_show.set_defaults(handler=cmd_show)
 
+    p_delete = sub.add_parser("delete", help="Delete a run, its local artifacts, fixtures, and default exports")
+    p_delete.add_argument("run_id")
+    p_delete.add_argument("--yes", action="store_true", help="Confirm deletion without an interactive prompt")
+    p_delete.add_argument("--keep-exports", action="store_true", help="Keep default files under .abb/exports for this run")
+    p_delete.add_argument("--json", action="store_true", help="Print a machine-readable deletion summary")
+    p_delete.set_defaults(handler=cmd_delete)
+
     p_search = sub.add_parser("search", help="Search recorded runs")
     p_search.add_argument("query")
     p_search.add_argument("--json", action="store_true")
@@ -895,6 +902,48 @@ def cmd_show(args: argparse.Namespace) -> int:
         for annotation in timeline["annotations"]:
             target = f" span={annotation['span_id']}" if annotation.get("span_id") else ""
             print(f"- {annotation['created_at']}{target} {annotation['message']}")
+    return 0
+
+
+def cmd_delete(args: argparse.Namespace) -> int:
+    if not args.yes:
+        print(
+            "Refusing to delete without confirmation. Re-run with `--yes` after exporting anything you need.",
+            file=sys.stderr,
+        )
+        return 2
+    store = ABBStore(args.data_dir)
+    try:
+        result = store.delete_run(args.run_id, include_exports=not args.keep_exports)
+    except KeyError:
+        print(f"Run not found: {args.run_id}", file=sys.stderr)
+        return 1
+    finally:
+        store.close()
+    if args.json:
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0
+    counts = result.get("counts") or {}
+    print(f"Deleted run: {result['run_id']}")
+    print(
+        "Removed: "
+        f"{counts.get('spans', 0)} spans, "
+        f"{counts.get('events', 0)} events, "
+        f"{counts.get('artifacts', 0)} artifacts, "
+        f"{counts.get('annotations', 0)} annotations, "
+        f"{counts.get('fixtures', 0)} fixtures"
+    )
+    print(
+        "Local files removed: "
+        f"{counts.get('artifact_objects', 0)} object files "
+        f"({counts.get('artifact_bytes', 0)} bytes), "
+        f"{counts.get('export_files', 0)} export files "
+        f"({counts.get('export_bytes', 0)} bytes)"
+    )
+    if result.get("linked_investigations"):
+        print("Linked investigation runs were kept:")
+        for linked_run_id in result["linked_investigations"]:
+            print(f"- {linked_run_id}")
     return 0
 
 

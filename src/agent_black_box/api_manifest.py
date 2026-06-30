@@ -121,6 +121,16 @@ API_ENDPOINTS: List[Dict[str, Any]] = [
         "cli": "abb export RUN_ID --format FORMAT",
     },
     {
+        "id": "runs.delete",
+        "category": "Runs",
+        "method": "DELETE",
+        "path": "/v1/runs/{run_id}",
+        "summary": "Delete a run, its local trace rows, artifacts, fixtures, and default export files.",
+        "query": ["keep_exports=true|false"],
+        "returns": "deletion summary with removed counts and linked investigations kept",
+        "cli": "abb delete RUN_ID --yes",
+    },
+    {
         "id": "spans.create",
         "category": "Capture",
         "method": "POST",

@@ -171,6 +171,7 @@ abb handoff RUN_ID
 abb handoff --file .abb/exports/RUN_ID.handoff.json
 abb handoff --ingest .abb/exports/RUN_ID.handoff.json
 abb support RUN_ID
+abb delete RUN_ID --yes --json
 ```
 
 Confirm:
@@ -192,6 +193,9 @@ Confirm:
 - `abb support RUN_ID` creates a support directory with briefing, handoff JSON, timeline metadata, doctor report, and offline troubleshooting/known-limitations notes.
 - The support packet `doctor.json` uses the same schema as `abb doctor --json`.
 - `abb support RUN_ID --include-bundle` adds the full `.abb` trace archive.
+- `abb delete RUN_ID --yes --json` removes the run, spans, events, annotations, fixtures, artifact rows, unreferenced object files, and default export files while keeping linked investigation runs.
+- `DELETE /v1/runs/RUN_ID` returns the same deletion summary and is documented by `abb endpoints --json` and OpenAPI.
+- Browser run detail includes a delete action that removes the run from the local list after confirmation.
 
 ## Bundle Verification
 
@@ -218,6 +222,7 @@ Confirm:
 
 - Confirm obvious API keys, bearer tokens, passwords, and private keys are redacted.
 - Confirm exports do not include unredacted known secrets.
+- Confirm local runs can be deleted with `abb delete RUN_ID --yes`, and that deletion removes default local exports unless `--keep-exports` is used.
 - Confirm `.abb` bundles include only redacted trace data and local artifact payloads.
 - Confirm OpenAI wrapper request/response artifacts are stored locally.
 - Confirm OpenAI wrapper/proxy usage stats are stored locally when responses include usage data.

@@ -141,6 +141,7 @@ The alpha is usable when a first user can answer:
 - What did the handoff packet tell the next agent?
 - Can I create a follow-up investigation from the handoff?
 - Can I move the full trace to another local store?
+- Can I delete a local run and see its artifacts, fixtures, and default exports removed?
 - Can I see source and investigation links in CLI and UI?
 - Do I have a clear next setup path for CLI capture, SDK instrumentation, OpenAI import swap, or proxy routing?
 - Can I capture a model-shaped call locally without a live API key?

@@ -210,6 +210,20 @@ Imported and remapped runs are labeled in the browser UI and CLI detail output.
 The browser UI also has an `Import ABB` control in the Runs sidebar for importing a local
 `.abb` bundle path with the same conflict modes.
 
+Delete a local run and its default export files:
+
+```bash
+abb delete RUN_ID --yes
+abb delete RUN_ID --yes --keep-exports
+abb delete RUN_ID --yes --json
+```
+
+Delete removes the run, spans, events, annotations, replay fixtures, artifact
+rows, unreferenced local object files, and default files in `.abb/exports/` for
+that run. Linked handoff or compare investigation runs are kept and reported.
+The browser run detail has the same action, and the daemon exposes it as
+`DELETE /v1/runs/RUN_ID`.
+
 Create and replay a fixture:
 
 ```bash
@@ -245,7 +259,7 @@ http://127.0.0.1:43188
 
 The local UI has three main views:
 
-- `Runs`: search/filter runs, inspect timelines, add annotations, preview artifacts, import/export bundles, ingest compare and handoff packets, export agent handoff packets, and create fixtures.
+- `Runs`: search/filter runs, inspect timelines, add annotations, preview artifacts, import/export bundles, ingest compare and handoff packets, export agent handoff packets, create fixtures, and delete local runs.
 - `Fixtures`: replay a captured run as a terminal-style sequence.
 - `Diff`: compare two runs by counts, span/event types, and first divergence.
 

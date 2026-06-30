@@ -219,6 +219,10 @@ class BrowserUiTests(unittest.TestCase):
             "downloadSelectedCompare",
             "showCompareExportText",
             "hideCompareExportText",
+            "delete-run-button",
+            "deleteRun",
+            "DELETE",
+            "delete-run-result",
             "fetchCompareExport",
             "/compare-export",
             "URLSearchParams",
@@ -293,11 +297,14 @@ class CliDisplayTests(unittest.TestCase):
         self.assertIn(("POST", "/v1/agent-kit"), endpoints)
         self.assertIn(("GET", "/v1/runs/{run_id}/compare-export"), endpoints)
         self.assertIn(("GET", "/v1/runs/{run_id}/compare-evidence"), endpoints)
+        self.assertIn(("DELETE", "/v1/runs/{run_id}"), endpoints)
         self.assertIn(("POST", "/v1/compare/ingest"), endpoints)
         self.assertIn(("POST", "/v1/handoffs/ingest"), endpoints)
         self.assertIn("ABB_AUTH_TOKEN", manifest["authentication"]["header"])
 
         text = format_api_manifest(manifest)
+        self.assertIn("DELETE /v1/runs/{run_id}", text)
+        self.assertIn("abb delete RUN_ID --yes", text)
         self.assertIn("GET /v1/runs/{run_id}/compare-evidence", text)
         self.assertIn("GET /v1/openapi.json", text)
         self.assertIn("POST /v1/agent-kit", text)
@@ -313,6 +320,7 @@ class CliDisplayTests(unittest.TestCase):
         self.assertIn("/v1/openapi.json", paths)
         self.assertIn("/v1/agent-kit", paths)
         self.assertIn("/v1/runs/{run_id}", paths)
+        self.assertIn("delete", paths["/v1/runs/{run_id}"])
         self.assertIn("/v1/runs/{run_id}/timeline", paths)
         self.assertIn("/v1/runs/{run_id}/artifacts", paths)
         self.assertIn("/v1/artifacts/{artifact_id}", paths)
@@ -326,6 +334,7 @@ class CliDisplayTests(unittest.TestCase):
         self.assertIn("200", paths["/v1/bundles/import"]["post"]["responses"])
         self.assertIn("201", paths["/v1/bundles/import"]["post"]["responses"])
         self.assertEqual(paths["/v1/agent-kit"]["post"]["operationId"], "agentKitCreate")
+        self.assertEqual(paths["/v1/runs/{run_id}"]["delete"]["operationId"], "runsDelete")
         self.assertEqual(
             paths["/v1/runs/{run_id}/compare-evidence"]["get"]["operationId"],
             "compareEvidence",
@@ -374,6 +383,7 @@ class CliDisplayTests(unittest.TestCase):
         feedback = (ROOT / "docs" / "DESIGN_PARTNER_FEEDBACK_FORM.md").read_text()
         tracker = (ROOT / "docs" / "DESIGN_PARTNER_TRACKER.md").read_text()
         tracker_csv = (ROOT / "docs" / "DESIGN_PARTNER_TRACKER.csv").read_text()
+        api_reference = (ROOT / "docs" / "API_REFERENCE.md").read_text()
         readme = (ROOT / "README.md").read_text()
         release_notes = (ROOT / "docs" / "ALPHA_RELEASE_NOTES.md").read_text()
 
@@ -434,8 +444,13 @@ class CliDisplayTests(unittest.TestCase):
         self.assertIn("LOCAL_AUTOMATION_NAME", tracker_csv)
         self.assertIn("SHA256_FROM_RELEASE_MANIFEST", tracker_csv)
         self.assertIn("decision", tracker_csv)
+        self.assertIn("DELETE", api_reference)
+        self.assertIn("/v1/runs/{run_id}", api_reference)
+        self.assertIn("keep_exports", api_reference)
         self.assertIn("TROUBLESHOOTING.md", readme)
         self.assertIn("KNOWN_LIMITATIONS.md", readme)
+        self.assertIn("abb delete RUN_ID --yes", readme)
+        self.assertIn("DELETE /v1/runs/RUN_ID", readme)
         self.assertIn("DESIGN_PARTNER_INTAKE.md", readme)
         self.assertIn("DESIGN_PARTNER_FIRST_SEND_PACKET.md", readme)
         self.assertIn("DESIGN_PARTNER_HANDOFF.md", readme)
@@ -453,12 +468,14 @@ class CliDisplayTests(unittest.TestCase):
         self.assertIn("DESIGN_PARTNER_TRACKER.md", release_notes)
         self.assertIn("scripts/prepare-design-partner-send.py", release_notes)
         self.assertIn("scripts/feedback-summary.py", release_notes)
+        self.assertIn("abb delete RUN_ID --yes", release_notes)
         self.assertIn("TROUBLESHOOTING.md", release_notes)
         self.assertIn("KNOWN_LIMITATIONS.md", release_notes)
         self.assertIn("Daemon Is Not Running", troubleshooting)
         self.assertIn("Localhost Probe Is Blocked", troubleshooting)
         self.assertIn("Auth Token Fails", troubleshooting)
         self.assertIn("Browser UI", limitations)
+        self.assertIn("abb delete RUN_ID --yes", limitations)
         self.assertIn("OpenAPI", limitations)
 
     def test_rank_design_partners_selects_high_signal_candidates(self):
@@ -1125,6 +1142,80 @@ class StorageTests(unittest.TestCase):
 
             matches = store.search("bad model")
             self.assertEqual(matches[0]["run_id"], run["run_id"])
+            store.close()
+
+    def test_delete_run_removes_local_trace_files_and_exports(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ABBStore(tmp)
+            run = store.create_run({"name": "delete me", "source": "unit-test"})
+            span = store.start_span({"run_id": run["run_id"], "type": "tool.call", "name": "write artifact"})
+            artifact = store.add_artifact(run["run_id"], span["span_id"], "test.artifact", "delete payload")
+            store.add_event(
+                {
+                    "run_id": run["run_id"],
+                    "span_id": span["span_id"],
+                    "type": "tool.completed",
+                    "message": "done",
+                    "attributes": {"artifact_ref": artifact["artifact_id"]},
+                }
+            )
+            store.end_span(span["span_id"], output_ref=artifact["artifact_id"])
+            store.end_run(run["run_id"])
+            store.add_annotation(run["run_id"], "delete annotation")
+            store.create_fixture(run["run_id"], name="delete fixture")
+            artifact_path = Path(tmp) / artifact["path"]
+            markdown_export = store.export_run(run["run_id"], fmt="markdown")
+            handoff_export = store.export_run(run["run_id"], fmt="handoff")
+            bundle_export = store.export_bundle(run["run_id"])
+            handoff = store.build_handoff_packet(run["run_id"])
+            ingested = store.ingest_handoff_packet(handoff, format_handoff_briefing(handoff))
+            investigation_id = ingested["run"]["run_id"]
+            store.close()
+
+            stderr = io.StringIO()
+            with contextlib.redirect_stderr(stderr):
+                self.assertEqual(cli_main(["--data-dir", tmp, "delete", run["run_id"]]), 2)
+            self.assertIn("--yes", stderr.getvalue())
+
+            stdout = io.StringIO()
+            with contextlib.redirect_stdout(stdout):
+                rc = cli_main(["--data-dir", tmp, "delete", run["run_id"], "--yes", "--json"])
+            self.assertEqual(rc, 0)
+            result = json.loads(stdout.getvalue())
+            self.assertTrue(result["deleted"])
+            self.assertEqual(result["run_id"], run["run_id"])
+            self.assertEqual(result["counts"]["runs"], 1)
+            self.assertEqual(result["counts"]["spans"], 1)
+            self.assertGreaterEqual(result["counts"]["events"], 2)
+            self.assertEqual(result["counts"]["artifacts"], 1)
+            self.assertEqual(result["counts"]["fixtures"], 1)
+            self.assertEqual(result["counts"]["artifact_objects"], 1)
+            self.assertEqual(result["counts"]["export_files"], 3)
+            self.assertEqual(result["linked_investigations"], [investigation_id])
+            self.assertFalse(artifact_path.exists())
+            self.assertFalse(markdown_export.exists())
+            self.assertFalse(handoff_export.exists())
+            self.assertFalse(bundle_export.exists())
+
+            verify = ABBStore(tmp)
+            self.assertIsNone(verify.get_run(run["run_id"]))
+            self.assertIsNotNone(verify.get_run(investigation_id))
+            self.assertEqual(verify.list_fixtures_for_run(run["run_id"]), [])
+            verify.close()
+
+    def test_delete_run_can_keep_default_exports(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ABBStore(tmp)
+            run = store.create_run({"name": "keep exports", "source": "unit-test"})
+            span = store.start_span({"run_id": run["run_id"], "type": "tool.call", "name": "write artifact"})
+            artifact = store.add_artifact(run["run_id"], span["span_id"], "test.artifact", "keep export payload")
+            store.end_span(span["span_id"], output_ref=artifact["artifact_id"])
+            store.end_run(run["run_id"])
+            export_path = store.export_run(run["run_id"], fmt="markdown")
+            result = store.delete_run(run["run_id"], include_exports=False)
+            self.assertEqual(result["counts"]["export_files"], 0)
+            self.assertTrue(export_path.exists())
+            self.assertIsNone(store.get_run(run["run_id"]))
             store.close()
 
     def test_bundle_export_import_round_trip(self):
