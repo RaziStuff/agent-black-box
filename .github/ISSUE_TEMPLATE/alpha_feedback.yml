@@ -1,0 +1,73 @@
+name: Local alpha feedback
+description: Share install, first-run, debugging, handoff, or privacy feedback.
+title: "[Alpha feedback] "
+labels: ["alpha feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for trying Agent Black Box. Please keep this issue safe to share publicly.
+
+        Do not paste secrets, customer data, private trace payloads, API keys, or full `.abb` bundles.
+  - type: input
+    id: version
+    attributes:
+      label: Version or release
+      placeholder: "v0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS and Python version
+      placeholder: "macOS 14, Python 3.11"
+    validations:
+      required: true
+  - type: checkboxes
+    id: completed
+    attributes:
+      label: What did you try?
+      options:
+        - label: Downloaded the design-partner zip
+        - label: Ran `sh install.sh`
+        - label: Ran `abb doctor`
+        - label: Ran a demo from `docs/FIRST_USER_WORKFLOW.md`
+        - label: Recorded a run
+        - label: Inspected a run with `abb show RUN_ID`
+        - label: Created `abb support RUN_ID`
+        - label: Created `abb handoff RUN_ID`
+        - label: Tried `abb delete RUN_ID --yes`
+  - type: dropdown
+    id: result
+    attributes:
+      label: Outcome
+      options:
+        - Installed and recorded a run without help
+        - Installed but got confused during first workflow
+        - Install failed
+        - Doctor failed or warned unexpectedly
+        - Workflow failed after a run existed
+        - Feedback only
+    validations:
+      required: true
+  - type: textarea
+    id: useful
+    attributes:
+      label: Most useful moment
+      description: What made the run easier to understand?
+  - type: textarea
+    id: confusing
+    attributes:
+      label: First confusing moment
+      description: What command, page, output, or concept caused confusion?
+  - type: textarea
+    id: error
+    attributes:
+      label: Error output or support artifact summary
+      description: Paste only safe-to-share output. Prefer `abb doctor --json`, a redacted support summary, or a handoff summary over full bundles.
+      render: text
+  - type: textarea
+    id: notes
+    attributes:
+      label: Open notes
+      description: Anything else we should know before the next alpha build?

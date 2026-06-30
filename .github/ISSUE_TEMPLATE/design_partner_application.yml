@@ -1,0 +1,83 @@
+name: Design partner application
+description: Apply to test the Agent Black Box local alpha.
+title: "[Design partner] "
+labels: ["design partner", "alpha"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for testing Agent Black Box. We are looking for people who are actively building, debugging, or operating AI agent workflows and can spend 20 to 40 minutes on the local alpha.
+
+        Please do not paste secrets, customer data, private trace payloads, API keys, or full `.abb` bundles into this issue.
+  - type: dropdown
+    id: segment
+    attributes:
+      label: Which segment best fits you?
+      options:
+        - Agent founder
+        - Agent infra/platform engineer
+        - Local automation builder
+        - Other agent builder
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: What agent workflow are you actively building or debugging?
+      description: A short description is enough.
+      placeholder: "Example: a local research agent with tool calls, retries, and handoff to another agent."
+    validations:
+      required: true
+  - type: dropdown
+    id: recent
+    attributes:
+      label: Have you worked on this agent workflow in the last 14 days?
+      options:
+        - "Yes"
+        - "No"
+    validations:
+      required: true
+  - type: dropdown
+    id: terminal
+    attributes:
+      label: Are you comfortable running local terminal commands?
+      options:
+        - "Yes, comfortable"
+        - "Somewhat, with copied commands"
+        - "No"
+    validations:
+      required: true
+  - type: textarea
+    id: pain
+    attributes:
+      label: What is painful about debugging or handing off this agent today?
+      placeholder: "Example: logs are scattered, tool inputs are hard to inspect, another agent cannot pick up the case."
+    validations:
+      required: true
+  - type: dropdown
+    id: time
+    attributes:
+      label: Can you spend 20 to 40 minutes and return lightweight feedback?
+      options:
+        - "Yes"
+        - "Maybe"
+        - "No"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Local environment
+      description: OS, Python version if known, and whether you can install from a zip.
+      placeholder: "macOS 14, Python 3.11, can install from zip"
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy boundary
+      options:
+        - label: I understand Agent Black Box stores data locally by default.
+          required: true
+        - label: I will not attach secrets, customer data, private traces, or full `.abb` bundles unless I have reviewed them.
+          required: true
+        - label: I can share a feedback form, `abb doctor --json`, `abb support RUN_ID`, or `abb handoff RUN_ID` if something breaks.
+          required: false
