@@ -1,5 +1,7 @@
 # Agent Black Box
 
+[![CI](https://github.com/RaziStuff/agent-black-box/actions/workflows/ci.yml/badge.svg)](https://github.com/RaziStuff/agent-black-box/actions/workflows/ci.yml)
+
 Agent Black Box is a local-first flight recorder for AI agents. This repository now contains the first runnable MVP spine: local SQLite storage, a localhost daemon, a tiny browser viewer, a CLI, a Python SDK, redaction, export, and a demo agent.
 
 ## Local Alpha
