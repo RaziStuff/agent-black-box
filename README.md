@@ -11,6 +11,34 @@ Agent Black Box v0.1.0 is available as a public local alpha:
 - Apply to test: <https://github.com/RaziStuff/agent-black-box/issues/new?template=design_partner_application.yml>
 - Share alpha feedback: <https://github.com/RaziStuff/agent-black-box/issues/new?template=alpha_feedback.yml>
 
+## Try It In 60 Seconds
+
+No account, API key, cloud service, or package registry is required for the
+first local proof.
+
+From a source checkout:
+
+```bash
+python3 abb.py doctor
+python3 abb.py record --name sixty-second-demo -- python3 examples/basic_agent.py
+python3 abb.py runs
+python3 abb.py show RUN_ID
+python3 abb.py delete RUN_ID --yes
+```
+
+Replace `RUN_ID` with the newest `run_...` value from `python3 abb.py runs`.
+
+Success looks like:
+
+- `doctor` reports local storage and the CLI as ok.
+- The daemon warning is expected until you run `abb start`.
+- `record` prints a new `run_...` ID and captures the demo output.
+- `show` prints a run summary, timeline, artifacts, and Debug Path.
+- `delete` removes the local run and unreferenced artifact object.
+
+See [docs/DEMO_TRANSCRIPT.md](docs/DEMO_TRANSCRIPT.md) for the exact output from
+this path.
+
 ## Quickstart
 
 For the end-to-end local alpha path, use `docs/FIRST_USER_WORKFLOW.md`.
