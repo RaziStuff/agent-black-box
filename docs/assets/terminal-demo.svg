@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">Agent Black Box terminal demo</title>
+  <desc id="desc">A terminal transcript showing doctor, record, inspect, and delete commands for Agent Black Box.</desc>
+  <rect width="1200" height="680" fill="#121417"/>
+  <rect x="34" y="34" width="1132" height="612" rx="8" fill="#191d21" stroke="#2a3036" stroke-width="2"/>
+  <rect x="34" y="34" width="1132" height="54" rx="8" fill="#252b31"/>
+  <circle cx="70" cy="61" r="8" fill="#e85d3f"/>
+  <circle cx="98" cy="61" r="8" fill="#f0b429"/>
+  <circle cx="126" cy="61" r="8" fill="#3abf7a"/>
+  <text x="172" y="67" fill="#cbd5df" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="18">Agent Black Box local alpha</text>
+
+  <g font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="24">
+    <text x="70" y="138" fill="#4be28b">$ python3 abb.py doctor</text>
+    <text x="70" y="180" fill="#e9edf1">Status: warning (0 errors, 1 warnings)</text>
+    <text x="70" y="218" fill="#e9edf1">- [ok] storage: Local store is writable</text>
+    <text x="70" y="256" fill="#e9edf1">- [ok] cli: CLI entrypoint is available</text>
+    <text x="70" y="294" fill="#f0b429">- [warning] daemon: not running until abb start</text>
+
+    <text x="70" y="360" fill="#4be28b">$ python3 abb.py record --name demo -- python3 examples/basic_agent.py</text>
+    <text x="70" y="402" fill="#e9edf1">Recorded run: run_524ec4800c4540b0b7f476b9</text>
+
+    <text x="70" y="468" fill="#4be28b">$ python3 abb.py show run_524ec4800c4540b0b7f476b9</text>
+    <text x="70" y="510" fill="#e9edf1">Summary: 0 model calls, 0 tool calls, 1 artifact</text>
+    <text x="70" y="548" fill="#e9edf1">Debug Path: inspect the first warning and transcript</text>
+
+    <text x="70" y="614" fill="#4be28b">$ python3 abb.py delete RUN_ID --yes</text>
+  </g>
+
+  <rect x="816" y="584" width="294" height="42" rx="8" fill="#f15b2a"/>
+  <text x="846" y="612" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700">No API key required</text>
+</svg>

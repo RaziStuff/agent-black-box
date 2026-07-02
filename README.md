@@ -4,10 +4,13 @@
 
 Agent Black Box is a local-first flight recorder for AI agents. This repository now contains the first runnable MVP spine: local SQLite storage, a localhost daemon, a tiny browser viewer, a CLI, a Python SDK, redaction, export, and a demo agent.
 
+![Agent Black Box terminal demo](docs/assets/terminal-demo.svg)
+
 ## Local Alpha
 
 Agent Black Box v0.1.0 is available as a public local alpha:
 
+- Landing page: <https://razistuff.github.io/agent-black-box/>
 - Release: <https://github.com/RaziStuff/agent-black-box/releases/tag/v0.1.0>
 - Design-partner call: [docs/PUBLIC_DESIGN_PARTNER_CALL.md](docs/PUBLIC_DESIGN_PARTNER_CALL.md)
 - Apply to test: <https://github.com/RaziStuff/agent-black-box/issues/new?template=design_partner_application.yml>
