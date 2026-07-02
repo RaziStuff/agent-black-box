@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Agent Black Box social preview</title>
+  <desc id="desc">Agent Black Box is a local-first flight recorder and replay debugger for AI agents.</desc>
+  <rect width="1200" height="630" fill="#f5f7fa"/>
+  <rect x="54" y="54" width="1092" height="522" rx="8" fill="#ffffff" stroke="#d7dee7" stroke-width="2"/>
+  <text x="96" y="126" fill="#168a53" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="800" letter-spacing="2">LOCAL-FIRST ALPHA</text>
+  <text x="96" y="218" fill="#15191e" font-family="Inter, Arial, sans-serif" font-size="72" font-weight="900">Agent Black Box</text>
+  <text x="96" y="292" fill="#15191e" font-family="Inter, Arial, sans-serif" font-size="46" font-weight="800">Flight recorder for AI agents</text>
+  <text x="96" y="364" fill="#52606d" font-family="Inter, Arial, sans-serif" font-size="30">Record runs locally. Inspect the Debug Path.</text>
+  <text x="96" y="408" fill="#52606d" font-family="Inter, Arial, sans-serif" font-size="30">Export handoff packets. Delete trace data.</text>
+  <rect x="96" y="478" width="288" height="58" rx="8" fill="#db5128"/>
+  <text x="126" y="517" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="800">Try v0.1.0 alpha</text>
+  <rect x="790" y="126" width="260" height="314" rx="8" fill="#15191e"/>
+  <text x="824" y="181" fill="#4be28b" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="22">$ abb doctor</text>
+  <text x="824" y="226" fill="#e9edf1" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="22">storage ok</text>
+  <text x="824" y="271" fill="#4be28b" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="22">$ abb record</text>
+  <text x="824" y="316" fill="#e9edf1" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="22">run_524...</text>
+  <text x="824" y="361" fill="#4be28b" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="22">$ abb show</text>
+  <text x="824" y="406" fill="#e9edf1" font-family="SFMono-Regular, Menlo, Consolas, monospace" font-size="22">Debug Path</text>
+</svg>
