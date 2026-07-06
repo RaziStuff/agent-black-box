@@ -146,6 +146,13 @@
       color: #ffffff;
     }
 
+    .note {
+      max-width: 760px;
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
     .visual {
       margin-top: 42px;
       border: 1px solid #27313a;
@@ -209,6 +216,19 @@
       line-height: 1.6;
     }
 
+    .checksum {
+      overflow-wrap: anywhere;
+      display: inline-block;
+      max-width: 100%;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f5f7fa;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
     code {
       font-family: SFMono-Regular, Menlo, Consolas, monospace;
     }
@@ -264,7 +284,7 @@
     <nav class="wrap" aria-label="Primary navigation">
       <a class="brand" href="https://github.com/RaziStuff/agent-black-box">Agent Black Box</a>
       <div class="links">
-        <a href="https://github.com/RaziStuff/agent-black-box/releases/tag/v0.1.0">Download</a>
+        <a href="https://github.com/RaziStuff/agent-black-box/releases/download/v0.1.0/agent-black-box-0.1.0-design-partner.zip">Download</a>
         <a href="https://github.com/RaziStuff/agent-black-box/issues/1">Design Partners</a>
         <a href="https://github.com/RaziStuff/agent-black-box">GitHub</a>
       </div>
@@ -278,13 +298,30 @@
         <h1>Agent Black Box records AI agent runs so you can debug them locally.</h1>
         <p class="lede">Capture a run, inspect the Debug Path, export support or handoff packets, and delete local trace data when you are done. No account or API key required for the demo path.</p>
         <div class="actions" aria-label="Primary actions">
-          <a class="button primary" href="https://github.com/RaziStuff/agent-black-box/releases/tag/v0.1.0">Download v0.1.0</a>
+          <a class="button primary" href="https://github.com/RaziStuff/agent-black-box/releases/download/v0.1.0/agent-black-box-0.1.0-design-partner.zip">Download alpha zip</a>
+          <a class="button" href="https://github.com/RaziStuff/agent-black-box/releases/tag/v0.1.0">View release</a>
           <a class="button" href="https://github.com/RaziStuff/agent-black-box/issues/6">Try a real workflow</a>
           <a class="button" href="https://github.com/RaziStuff/agent-black-box/blob/main/docs/DEMO_TRANSCRIPT.md">Read transcript</a>
         </div>
+        <p class="note">Checksum for <code>agent-black-box-0.1.0-design-partner.zip</code>:</p>
+        <code class="checksum">20e3f38638c03fd24a94199ef2d058313214055c1a05a7fb67f678f5cc91db62</code>
         <div class="visual">
           <img src="assets/terminal-demo.svg" alt="Terminal transcript showing Agent Black Box doctor, record, show, and delete commands">
         </div>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="wrap split">
+        <div>
+          <h2>After download</h2>
+          <p>Unzip the design-partner kit, install into its local virtualenv, and run the doctor before recording a demo run.</p>
+        </div>
+        <pre><code>unzip agent-black-box-0.1.0-design-partner.zip
+cd agent-black-box-0.1.0-design-partner
+sh install.sh
+. .venv/bin/activate
+abb doctor</code></pre>
       </div>
     </section>
 
